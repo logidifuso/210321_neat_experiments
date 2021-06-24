@@ -1,0 +1,12 @@
+digraph {
+	node [fontsize=9 height=0.2 shape=circle width=0.2]
+	x [fillcolor=lightgray shape=box style=filled]
+	dot_x [fillcolor=lightgray shape=box style=filled]
+	"θ" [fillcolor=lightgray shape=box style=filled]
+	"dot_θ" [fillcolor=lightgray shape=box style=filled]
+	action [fillcolor=lightblue style=filled]
+	x -> action [color=green penwidth=0.12946095870722277 style=solid]
+	dot_x -> action [color=green penwidth=0.20759235679910404 style=solid]
+	"θ" -> action [color=green penwidth=0.29298049789745045 style=solid]
+	"dot_θ" -> action [color=green penwidth=0.5699023176812965 style=solid]
+}

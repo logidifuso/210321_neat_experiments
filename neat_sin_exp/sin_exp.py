@@ -149,7 +149,7 @@ def run_experiment(config_file, checkpoint=None, mp=False, num_generaciones=10):
         # Comprobación de si el mejor genoma es un hit
         net = neat.nn.FeedForwardNetwork.create(best_genome, config)
         print("\n\nRe-evaluación del mejor individuo")
-        hit = evaluate_best_net(net, configuracion)
+        hit = evaluate_best_net(net, config)
         if hit:
             print("ÉXITO!!!")
         else:
@@ -157,10 +157,10 @@ def run_experiment(config_file, checkpoint=None, mp=False, num_generaciones=10):
 
         # Visualiza los resultados del experimento
         node_names = {-1: 'x', 0: 'output'}
-        vis.draw_net(configuracion, best_genome, True, node_names=node_names, directory=out_dir, fmt='svg')
-        vis.plot_stats_sine(stats, ylog=False, view=True, filename=os.path.join(out_dir, 'avg_fitness.svg'))
-        vis.plot_species(stats, view=True, filename=os.path.join(out_dir, 'speciation.svg'))
-        plot_salida(net, view=True, filename=os.path.join(out_dir, 'salida.svg'))
+        vis.draw_net(config, best_genome, True, node_names=node_names, directory=graphs_dir, fmt='svg')
+        #vis.plot_stats_sine(stats, ylog=False, view=True, filename=os.path.join(graphs_dir, 'avg_fitness.svg'))
+        vis.plot_species(stats, view=True, filename=os.path.join(graphs_dir, 'speciation.svg'))
+        sin.plot_salida(net, view=True, filename=os.path.join(graphs_dir, 'salida.svg'))
 
     except:
         print("Stopping the Jobs. ", sys.exc_info())
@@ -193,7 +193,7 @@ if __name__ == '__main__':
     # Indica la ruta al archivo de configuración. Siempre que el archivo
     # de configuración se encuentre en el mismo folder el script se ejecutará
     # correctamente independientemente de cúal sea la carpeta de trabajo actual
-    config_path = os.path.join(local_dir, 'sin_config.ini')
+    config_path = os.path.join(local_dir, 'seno_config.ini')
 
     # os.makedirs(out_dir, exist_ok=True)  # Crea carpeta de salida #Original. Reemplazado por:
     # Limpia los resultados de la ejecución anterior (si los hubiera) o inicia la carpeta a usar
@@ -218,7 +218,7 @@ if __name__ == '__main__':
         ret = run_experiment(config_path, mp=True, num_generaciones=n_generaciones)
     # TODO: Annadir los gráficos de la mejor red, etc..
 ########################################################################################################################
-
+"""
     best_genome = p.run(eval_genomes, n=n_generations)
 
     # Muestra info del mejor genoma
@@ -239,3 +239,4 @@ if __name__ == '__main__':
     vis.plot_stats_sine(stats, ylog=False, view=True, filename=os.path.join(out_dir, 'avg_fitness.svg'))
     vis.plot_species(stats, view=True, filename=os.path.join(out_dir, 'speciation.svg'))
     plot_salida(net, view=True, filename=os.path.join(out_dir, 'salida.svg'))
+"""

@@ -3,6 +3,7 @@
 #
 import numpy as np
 import math as m
+import matplotlib.pyplot as plt
 
 
 def eval_fitness(net):
@@ -26,3 +27,35 @@ def eval_fitness(net):
     mse = 1/n_eval_points * np.sum(err)
     fitness = m.exp(-mse)
     return fitness
+
+
+def plot_salida(net, view=False, filename='salida.svg'):
+    """ Plots the population's average and best fitness. """
+    if plt is None:
+        warnings.warn("This display is not available due to a missing optional dependency (matplotlib)")
+        return
+
+    n_eval_points = 90
+    salida = np.ndarray([n_eval_points])
+    seno = np.ndarray([n_eval_points])
+    for i in range(n_eval_points):
+        valor = i * (2 * np.pi / n_eval_points)
+        # val = net.activate([valor])
+        salida[i] = net.activate([valor])[0]
+        seno[i] = (np.sin(valor)+1)/2
+
+    x = range(n_eval_points)
+
+    plt.plot(x, salida, 'b-', label="salida")
+    plt.plot(x, seno, 'r-', label="seno")
+
+    plt.title("Salida vs Valor exacto")
+    plt.xlabel("x")
+    plt.ylabel("Salida")
+    plt.grid()
+
+    plt.savefig(filename)
+    if view:
+        plt.show()
+
+    plt.close()

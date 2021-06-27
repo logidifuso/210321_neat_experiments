@@ -29,6 +29,47 @@ def eval_fitness(net):
     return fitness
 
 
+# ===================================================================================
+# Crea muestras del seno escogiendo 45 muestras de ángulo entre 0 y 360 al azar para
+# usar en las evaluaciones del fitness
+# ------------------------------------------------------------------------------------
+# create full sin list 1 step degrees
+degrees2radians = np.radians(np.arange(0, 360, 1))
+# samples
+sample_count = 45
+xx = np.random.choice(degrees2radians, sample_count, replace=False)
+yy = np.sin(xx)
+# ====================================================================================
+
+
+
+
+def eval_fitness_b(net):
+    # TODO: se utilizan está variables global y las otras o no? Si no, borrar
+    # global gens
+
+    # error_sum = 0.0
+    # outputs = []
+    # accs = []
+
+    def _imp():
+        _fitness = 0
+        for xi, xo in zip(xx, yy):
+            output = net.activate([xi])
+            xacc = 1 - abs(xo - output)
+            _fitness += xacc
+
+        _fitness = np.mean((_fitness / len(xx)))
+
+        return _fitness
+
+    fitness = (_imp()) * 100
+    fitness = np.round(fitness, decimals=4)
+    fitness = max(fitness, -1000.)
+
+    return fitness
+
+
 def plot_salida(net, view=False, filename='salida.svg'):
     """ Plots the population's average and best fitness. """
     if plt is None:

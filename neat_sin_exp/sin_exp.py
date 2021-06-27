@@ -6,7 +6,6 @@ import sys
 import neat
 
 # import math
-import numpy as np
 import random
 
 import multiprocessing
@@ -26,44 +25,6 @@ local_dir = os.path.dirname(__file__)
 # The directory to store outputs
 outputs_dir = os.path.join(local_dir, 'outputs')
 graphs_dir = os.path.join(outputs_dir, 'graphs')
-
-# ===================================================================================
-# Crea muestras del seno escogiendo 45 muestras de ángulo entre 0 y 360 al azar para
-# usar en las evaluaciones del fitness
-# ------------------------------------------------------------------------------------
-# create full sin list 1 step degrees
-degrees2radians = np.radians(np.arange(0, 360, 1))
-# samples
-sample_count = 45
-xx = np.random.choice(degrees2radians, sample_count, replace=False)
-yy = np.sin(xx)
-# ====================================================================================
-
-
-def eval_fitness(net):
-    # TODO: se utilizan está variables global y las otras o no? Si no, borrar
-    # global gens
-
-    # error_sum = 0.0
-    # outputs = []
-    # accs = []
-
-    def _imp():
-        _fitness = 0
-        for xi, xo in zip(xx, yy):
-            output = net.activate([xi])
-            xacc = 1 - abs(xo - output)
-            _fitness += xacc
-
-        _fitness = np.mean((_fitness / len(xx)))
-
-        return _fitness
-
-    fitness = (_imp()) * 100
-    fitness = np.round(fitness, decimals=4)
-    fitness = max(fitness, -1000.)
-
-    return fitness
 
 
 def eval_genomes_mp(genomes, config):
@@ -113,7 +74,6 @@ def evaluate_best_net(net, config):
 
 
 def run_experiment(config_file, checkpoint=None, mp=False, num_generaciones=10):
-    best_genome = None
 
     p, config = create_pool_and_config(config_file, checkpoint)
 
@@ -172,21 +132,6 @@ def run_experiment(config_file, checkpoint=None, mp=False, num_generaciones=10):
         return p, config
 
     return p, config
-
-
-# TODO: Dónde y para qué se utiliza?
-def evaluate_best(p, best_genome, config):
-
-    net = neat.nn.FeedForwardNetwork.create(best_genome, config)
-    accs = []
-    for xi, xo in zip(xx, yy):
-        output = net.activate([xi])
-        xacc = 1 - (abs(xo-output))
-        accs.append(xacc)
-
-    print("\nmean acc {}\n".format(
-        np.round(np.array(accs).mean() * 100., decimals=2)
-    ))
 
 
 if __name__ == '__main__':

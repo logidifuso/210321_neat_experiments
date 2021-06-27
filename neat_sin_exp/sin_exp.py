@@ -68,7 +68,7 @@ def eval_fitness(net):
 
 def eval_genomes_mp(genomes, config):
     net = neat.nn.FeedForwardNetwork.create(genomes, config)
-    genomes.fitness = eval_fitness(net)
+    genomes.fitness = sin.eval_fitness(net)
     return genomes.fitness
 
 
@@ -77,7 +77,7 @@ def eval_genomes_single(genomes, config):
     for genome_id, genome in genomes:
         # net = RecurrentNet.create(genome, config,1)
         net = neat.nn.FeedForwardNetwork.create(genome, config)
-        genome.fitness = eval_fitness(net)
+        genome.fitness = sin.eval_fitness(net)
 
 
 def create_pool_and_config(config_file, checkpoint):
@@ -158,7 +158,7 @@ def run_experiment(config_file, checkpoint=None, mp=False, num_generaciones=10):
         # Visualiza los resultados del experimento
         node_names = {-1: 'x', 0: 'output'}
         vis.draw_net(config, best_genome, True, node_names=node_names, directory=graphs_dir, fmt='svg')
-        #vis.plot_stats_sine(stats, ylog=False, view=True, filename=os.path.join(graphs_dir, 'avg_fitness.svg'))
+        vis.plot_stats_sine(stats, ylog=False, view=True, filename=os.path.join(graphs_dir, 'avg_fitness.svg'))
         vis.plot_species(stats, view=True, filename=os.path.join(graphs_dir, 'speciation.svg'))
         sin.plot_salida(net, view=True, filename=os.path.join(graphs_dir, 'salida.svg'))
 
@@ -216,7 +216,6 @@ if __name__ == '__main__':
                              mp=True, num_generaciones=n_generaciones)
     else:
         ret = run_experiment(config_path, mp=True, num_generaciones=n_generaciones)
-    # TODO: Annadir los gráficos de la mejor red, etc..
 ########################################################################################################################
 """
     best_genome = p.run(eval_genomes, n=n_generations)

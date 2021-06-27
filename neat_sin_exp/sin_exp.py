@@ -1,17 +1,22 @@
-import os,signal,sys
-import shutil
+import os
+import signal
+import sys
+# import shutil
 
 import neat
 
-import math
+# import math
 import numpy as np
+import random
 
 import multiprocessing
+
+# Local imports
 from CheckpointerBest import CheckpointerBest
-
-import common.visualize as vis
 import common.utils as utils
-
+import common.visualize as vis
+# Importación como Namespace Package
+import experim1_seno.sine_mod as sin
 
 # The current working directory
 local_dir = os.path.dirname(__file__)
@@ -27,19 +32,21 @@ graphs_dir = os.path.join(outputs_dir, 'graphs')
 # usar en las evaluaciones del fitness
 # ------------------------------------------------------------------------------------
 # create full sin list 1 step degrees
-degrees2radians = np.radians(np.arange(0,360,1))
+degrees2radians = np.radians(np.arange(0, 360, 1))
 # samples
 sample_count = 45
-xx = np.random.choice(degrees2radians,sample_count,replace=False)
+xx = np.random.choice(degrees2radians, sample_count, replace=False)
 yy = np.sin(xx)
 # ====================================================================================
 
-def eval_fitness(net):
-    global gens   # TODO: se utiliza está variable global o no?
 
-    error_sum = 0.0
-    outputs = []
-    accs = []
+def eval_fitness(net):
+    # TODO: se utilizan está variables global y las otras o no? Si no, borrar
+    # global gens
+
+    # error_sum = 0.0
+    # outputs = []
+    # accs = []
 
     def _imp():
         _fitness = 0
@@ -73,7 +80,7 @@ def eval_genomes_single(genomes, config):
         genome.fitness = eval_fitness(net)
 
 
-def createPoolAndConfig(config_file, checkpoint):
+def create_pool_and_config(config_file, checkpoint):
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation,
                          config_file)
@@ -88,10 +95,27 @@ def createPoolAndConfig(config_file, checkpoint):
     return p, config
 
 
-def run_experiment(config_file, checkpoint=None, mp=False):
+def evaluate_best_net(net, config):
+    """
+    Pequenna función para evaluar el mejor genoma encontrado durante la
+    ejecución del experimento
+
+    :param net: genema del mejor individuo encontrado
+    :param config: ruta al archivo de configuración del experimento
+    :return: True en caso de éxito; False en caso contrario
+    """
+
+    fitness = sin.eval_fitness(net)
+    if fitness < config.fitness_threshold:
+        return False
+    else:
+        return True
+
+
+def run_experiment(config_file, checkpoint=None, mp=False, num_generaciones=10):
     best_genome = None
 
-    p, config = createPoolAndConfig(config_file, checkpoint)
+    p, config = create_pool_and_config(config_file, checkpoint)
 
     # Add a stdout reporter to show progress in the terminal.
     p.add_reporter(neat.StdOutReporter(False))
@@ -114,11 +138,30 @@ def run_experiment(config_file, checkpoint=None, mp=False):
 
             """set_trace()
             return"""
-            best_genome = p.run(pe.evaluate, 113551)
+            best_genome = p.run(pe.evaluate, num_generaciones)
         else:
 
-            best_genome = p.run(eval_genomes_single, 1113551)
-            # print('\nBest genome:\n{!s}'.format(best_genome))
+            best_genome = p.run(eval_genomes_single, num_generaciones)
+
+        # Muestra info del mejor genoma
+        print('\nBest genome:\n{!s}'.format(best_genome))
+
+        # Comprobación de si el mejor genoma es un hit
+        net = neat.nn.FeedForwardNetwork.create(best_genome, config)
+        print("\n\nRe-evaluación del mejor individuo")
+        hit = evaluate_best_net(net, configuracion)
+        if hit:
+            print("ÉXITO!!!")
+        else:
+            print("FRACASO!!!")
+
+        # Visualiza los resultados del experimento
+        node_names = {-1: 'x', 0: 'output'}
+        vis.draw_net(configuracion, best_genome, True, node_names=node_names, directory=out_dir, fmt='svg')
+        vis.plot_stats_sine(stats, ylog=False, view=True, filename=os.path.join(out_dir, 'avg_fitness.svg'))
+        vis.plot_species(stats, view=True, filename=os.path.join(out_dir, 'speciation.svg'))
+        plot_salida(net, view=True, filename=os.path.join(out_dir, 'salida.svg'))
+
     except:
         print("Stopping the Jobs. ", sys.exc_info())
         if mp:
@@ -157,18 +200,42 @@ if __name__ == '__main__':
     # para guardar los resultados
     utils.clear_output(graphs_dir)
 
+    # Fijo semilla para reproducibilidad
+    seed = 1559231615
+    random.seed(seed)
+
+    # Fijo número máximo de generaciones.
+    # TODO: Se podría poner como argumento con un parsing (o config file)
+    n_generaciones = 5
+
     # Corre experimento. Para continuar a partir de un checkpont particular usa cp, eg. cp=1024
     cp = None
     if cp is not None:
         ret = run_experiment(config_path,
                              checkpoint="".join((outputs_dir, '/sin_exp-checkpoint-{}'.format(cp))),
-                             mp=True)
+                             mp=True, num_generaciones=n_generaciones)
     else:
-        ret = run_experiment(config_path, mp=True)
+        ret = run_experiment(config_path, mp=True, num_generaciones=n_generaciones)
     # TODO: Annadir los gráficos de la mejor red, etc..
 ########################################################################################################################
 
-    # Run the experiment
-    run_experiment(config_path, n_generations=35)
+    best_genome = p.run(eval_genomes, n=n_generations)
 
+    # Muestra info del mejor genoma
+    print('\nBest genome:\n{!s}'.format(best_genome))
 
+    # Comprobación de si el mejor genoma es un hit
+    net = neat.nn.FeedForwardNetwork.create(best_genome, configuracion)
+    print("\n\nRe-evaluación del mejor individuo")
+    hit = evaluate_best_net(net, configuracion)
+    if hit:
+        print("ÉXITO!!!")
+    else:
+        print("FRACASO!!!")
+
+    # Visualiza los resultados del experimento
+    node_names = {-1: 'x', 0: 'output'}
+    vis.draw_net(configuracion, best_genome, True, node_names=node_names, directory=out_dir, fmt='svg')
+    vis.plot_stats_sine(stats, ylog=False, view=True, filename=os.path.join(out_dir, 'avg_fitness.svg'))
+    vis.plot_species(stats, view=True, filename=os.path.join(out_dir, 'speciation.svg'))
+    plot_salida(net, view=True, filename=os.path.join(out_dir, 'salida.svg'))

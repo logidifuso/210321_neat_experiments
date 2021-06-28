@@ -20,7 +20,6 @@ import experim1_seno.sine_mod as sin
 # The current working directory
 local_dir = os.path.dirname(__file__)
 # local_dir = "./"                                    # Directoria actual
-
 # out_dir = os.path.join(local_dir, 'checkpoints') #Original, lo reemplazo por:
 # The directory to store outputs
 outputs_dir = os.path.join(local_dir, 'outputs')
@@ -135,9 +134,9 @@ def run_experiment(config_file, checkpoint=None, mp=False, num_generaciones=10):
 
 
 if __name__ == '__main__':
-    # Indica la ruta al archivo de configuración. Siempre que el archivo
-    # de configuración se encuentre en el mismo folder el script se ejecutará
-    # correctamente independientemente de cúal sea la carpeta de trabajo actual
+    # Indica la ruta al archivo de configuración. Siempre que el archivo de configuración se encuentre
+    # en el mismo folder el script se ejecutará correctamente independientemente de cúal sea la carpeta
+    # de trabajo actual
     config_path = os.path.join(local_dir, 'seno_config.ini')
 
     # os.makedirs(out_dir, exist_ok=True)  # Crea carpeta de salida #Original. Reemplazado por:
@@ -161,26 +160,3 @@ if __name__ == '__main__':
                              mp=True, num_generaciones=n_generaciones)
     else:
         ret = run_experiment(config_path, mp=True, num_generaciones=n_generaciones)
-########################################################################################################################
-"""
-    best_genome = p.run(eval_genomes, n=n_generations)
-
-    # Muestra info del mejor genoma
-    print('\nBest genome:\n{!s}'.format(best_genome))
-
-    # Comprobación de si el mejor genoma es un hit
-    net = neat.nn.FeedForwardNetwork.create(best_genome, configuracion)
-    print("\n\nRe-evaluación del mejor individuo")
-    hit = evaluate_best_net(net, configuracion)
-    if hit:
-        print("ÉXITO!!!")
-    else:
-        print("FRACASO!!!")
-
-    # Visualiza los resultados del experimento
-    node_names = {-1: 'x', 0: 'output'}
-    vis.draw_net(configuracion, best_genome, True, node_names=node_names, directory=out_dir, fmt='svg')
-    vis.plot_stats_sine(stats, ylog=False, view=True, filename=os.path.join(out_dir, 'avg_fitness.svg'))
-    vis.plot_species(stats, view=True, filename=os.path.join(out_dir, 'speciation.svg'))
-    plot_salida(net, view=True, filename=os.path.join(out_dir, 'salida.svg'))
-"""

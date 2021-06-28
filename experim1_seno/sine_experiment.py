@@ -27,38 +27,6 @@ out_dir = os.path.join(local_dir, 'out')
 out_dir = os.path.join(out_dir, 'seno')
 
 
-def plot_salida(net, view=False, filename='salida.svg'):
-    """ Plots the population's average and best fitness. """
-    if plt is None:
-        warnings.warn("This display is not available due to a missing optional dependency (matplotlib)")
-        return
-
-    n_eval_points = 90
-    salida = np.ndarray([n_eval_points])
-    seno = np.ndarray([n_eval_points])
-    for i in range(n_eval_points):
-        valor = i * (2 * np.pi / n_eval_points)
-        # val = net.activate([valor])
-        salida[i] = net.activate([valor])[0]
-        seno[i] = (np.sin(valor)+1)/2
-
-    x = range(n_eval_points)
-
-    plt.plot(x, salida, 'b-', label="salida")
-    plt.plot(x, seno, 'r-', label="seno")
-
-    plt.title("Salida vs Valor exacto")
-    plt.xlabel("x")
-    plt.ylabel("Salida")
-    plt.grid()
-
-    plt.savefig(filename)
-    if view:
-        plt.show()
-
-    plt.close()
-
-
 def eval_genomes(genomes, config):
     """
     The function to evaluate the fitness of each genome in 
@@ -144,14 +112,14 @@ def run_experiment(config_file, n_generations):
     vis.draw_net(configuracion, best_genome, True, node_names=node_names, directory=out_dir, fmt='svg')
     vis.plot_stats_sine(stats, ylog=False, view=True, filename=os.path.join(out_dir, 'avg_fitness.svg'))
     vis.plot_species(stats, view=True, filename=os.path.join(out_dir, 'speciation.svg'))
-    plot_salida(net, view=True, filename=os.path.join(out_dir, 'salida.svg'))
+    sin.plot_salida(net, view=True, filename=os.path.join(out_dir, 'salida.svg'))
 
 
 if __name__ == '__main__':
     # Determine path to configuration file. This path manipulation is
     # here so that the script will run successfully regardless of the
     # current working directory.
-    config_path = os.path.join(local_dir, 'sine_config.ini')
+    config_path = os.path.join(local_dir, 'seno_config.ini')
 
     # Limpia los resultados de la ejecución anterior (si los hubiera) o inicia la carpeta a usar
     # para guardar los resultados

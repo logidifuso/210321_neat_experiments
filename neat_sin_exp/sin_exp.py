@@ -1,3 +1,4 @@
+import time
 import os
 import signal
 import sys
@@ -46,7 +47,6 @@ def create_pool_and_config(config_file, checkpoint):
                          config_file)
 
     # Create the population, which is the top-level object for a NEAT run.
-
     if checkpoint is not None:
         p = neat.Checkpointer.restore_checkpoint(checkpoint)
     else:
@@ -81,10 +81,16 @@ def run_experiment(config_file, checkpoint=None, mp=False, num_generaciones=10):
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
 
-    # TODO: Experimentos previos grabo un checkpoint sólo cada 5 (var de add reporter). Aquí igual??
-    p.add_reporter(CheckpointerBest(filename_prefix="".join((outputs_dir, '/sin_exp-checkpoint-'))))
-    pe = None
+    # 2 opciones para guardar checkpointers:
+    #   a) Grabar checkpoint sólo cuando el fitness del mejor individuo ha mejorado
+    #   b) Grabar checkpoint cada cierto num_generaciones especificado (primer atributo de la Función
+    #      Checkpointer
+    # Comment out la opción descartada
 
+    # p.add_reporter(CheckpointerBest(filename_prefix="".join((outputs_dir, '/sin_exp-checkpoint-'))))
+    p.add_reporter(neat.Checkpointer(5, filename_prefix="".join((outputs_dir, '/sin_exp-checkpoint-'))))
+
+    pe = None
     # this part required to handle keyboard intterrupt correctly, and return population and config to evaluate test set.
     try:
 
@@ -134,6 +140,7 @@ def run_experiment(config_file, checkpoint=None, mp=False, num_generaciones=10):
 
 
 if __name__ == '__main__':
+
     # Indica la ruta al archivo de configuración. Siempre que el archivo de configuración se encuentre
     # en el mismo folder el script se ejecutará correctamente independientemente de cúal sea la carpeta
     # de trabajo actual
@@ -150,13 +157,18 @@ if __name__ == '__main__':
 
     # Fijo número máximo de generaciones.
     # TODO: Se podría poner como argumento con un parsing (o config file)
-    n_generaciones = 5
+    n_generaciones = 11
 
+    begin = time.time()
     # Corre experimento. Para continuar a partir de un checkpont particular usa cp, eg. cp=1024
-    cp = None
+    cp = 20
     if cp is not None:
         ret = run_experiment(config_path,
                              checkpoint="".join((outputs_dir, '/sin_exp-checkpoint-{}'.format(cp))),
                              mp=True, num_generaciones=n_generaciones)
     else:
         ret = run_experiment(config_path, mp=True, num_generaciones=n_generaciones)
+
+    end = time.time()
+    # Tiempo de ejecución de neat
+    print(f'Tiempo de ejecución del algoritmo: {end - begin}')

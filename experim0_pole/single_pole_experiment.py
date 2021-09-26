@@ -4,7 +4,6 @@
 
 import sys
 sys.path.append("../common")
-
 # The Python standard library import
 import os
 
@@ -87,8 +86,7 @@ def run_experiment(config_file, n_generations=100):
     # Display the best genome among generations.
     print('\nBest genome:\n{!s}'.format(best_genome))
 
-    # Check if the best genome is a winning Single-Pole balancing controller 
-    net = neat.nn.FeedForwardNetwork.create(best_genome, config)
+    # Check if the best genome is a winning Single-Pole balancing controller as
     print("\n\nEvaluating the best genome in random runs")
     success_runs = evaluate_best_net(net, config, additional_num_runs)
     print("Runs successful/expected: %d/%d" % (success_runs, additional_num_runs))
